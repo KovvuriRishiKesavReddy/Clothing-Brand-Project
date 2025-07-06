@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cloth Material Display</title>
+    <!-- Google Fonts: Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --button-gradient: linear-gradient(45deg, #3a86ff, #8338ec, #ffd60a);
+            --font-color-light: #fff;
+            --nav-background: rgba(2, 0, 36, 0.9);
+            --constant-background: #020024; /* Constant background color */
+        }
+
+        /* Reset & base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        .navbar {
+            height: 80px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-background);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            color: var(--font-color-light);
+            animation: colorChange 5s infinite alternate; /* Color change animation for text */
+        }
+        @keyframes colorChange {
+            0% { color: #3a86ff; }
+            25% { color: #8338ec; }
+            50% { color: #ffd60a; }
+            75% { color: #ff006e; }
+            100% { color: #00bfff; }
+        }
+
+        .navbar a {
+            color: var(--font-color-light);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #ffd60a; /* Change color on hover */
+        }
+        
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            animation: bgColorCycle 45s linear infinite;
+            color: var(--font-color-light);
+            display: flex;
+            flex-direction: column; /* Allow vertical stacking */
+            padding: 0; /* Remove padding */
+            overflow: hidden; /* Hide scrollbar */
+            position: relative;
+        }
+
+        @keyframes bgColorCycle {
+            0%   { background-color: #020024; }
+            15%  { background-color: #090979; }
+            30%  { background-color: #00d4ff; }
+            45%  { background-color: #3a0ca3; }
+            60%  { background-color: #4361ee; }
+            75%  { background-color: #4895ef; }
+            90%  { background-color: #4cc9f0; }
+            100% { background-color: #020024; }
+        }
+
+        .content {
+            margin-top: 80px; /* Space for fixed navbar */
+            height: calc(100% - 80px); /* Fill remaining height without extra space */
+            padding: 16px;
+            overflow-y: auto; /* Allow vertical scrolling */
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+        }
+
+        .content::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+        }
+
+        .cloth-display {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Three items per row */
+            gap: 70px; /* Increased gap between items */
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto; /* Center the grid */
+        }
+
+        .cloth-item {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(16px);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(58, 134, 255, 0.8);
+            max-width: 300px; /* Increased max width for each item */
+            width: 100%; /* Ensure it takes full width of the grid cell */
+            transition: transform 0.2s, background 0.3s; /* Animation for hover effect */
+        }
+
+        .cloth-item:hover {
+            transform: scale(1.05); /* Scale effect on hover */
+            background: rgba(255, 255, 255, 0.2); /* Change background color on hover */
+        }
+
+        .cloth-item img {
+            width: 100%;
+            max-width: 200px; /* Set a max width for images */
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .cloth-item h3 {
+            font-size: 1.8rem;
+            margin: 8px 0;
+        }
+
+        .cloth-item p {
+            font-size: 1.2rem;
+            color: var(--font-color-light);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .add-to-cart, .buy-now {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 8px 24px rgba(58, 134, 255, 0.8);
+            color: var(--font-color-light);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-to-cart {
+            background: #3a86ff; /* Add to Cart button color */
+        }
+
+        .add-to-cart:hover {
+            background: #0056b3; /* Darker shade on hover */
+        }
+
+        .buy-now {
+            background: #ff006e; /* Buy Now button color */
+        }
+
+        .buy-now:hover {
+            background: #ff4d94; /* Darker shade on hover */
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Center the notification */
+            background-color: #3a86ff; /* Vibrant background color */
+            color: white;
+            box-shadow: 0 8px 24px rgba(58, 134, 255, 0.8);
+            padding: 25px 30px;
+            border-radius: 35px;
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            transition: opacity 0.5s ease;
+            text-align: center; /* Center text */
+            font-size: 1.2rem; /* Font size for notification */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar h1 {
+                font-size: 1.5rem;
+            }
+
+            .navbar a {
+                font-size: 1rem;
+            }
+
+            .cloth-item h3 {
+                font-size: 1.5rem;
+            }
+
+            .cloth-item p {
+                font-size: 1rem;
+            }
+
+            .cloth-display {
+                grid-template-columns: repeat(2, 1fr); /* Two items per row on smaller screens */
+                gap: 30px; /* Adjusted gap for smaller screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar h1 {
+                font-size: 1.2rem;
+            }
+
+            .navbar a {
+                font-size: 0.9rem;
+            }
+
+            .cloth-item h3 {
+                font-size: 1.3rem;
+            }
+
+            .cloth-item p {
+                font-size: 0.9rem;
+            }
+
+            .cloth-display {
+                grid-template-columns: 1fr; /* One item per row on very small screens */
+                gap: 20px; /* Adjusted gap for very small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="three.html"><h1>Clothing Brand</h1></a>
+        <div>
+            <a href="three.html">Home</a>
+            <a href="dress.html">Ready-Made</a>
+            <a href="material.html">Fabric</a>
+            <a href="cart.html">Cart</a>
+            <a href="buy.html">Buy</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="cloth-display" aria-label="Cloth Materials">
+            <div class="cloth-item">
+                <img src="silk.jpg" alt="Allen-Solly Fabric" />
+                <h3>Allen-Solly Fabric</h3>
+                <p>₹280.00 per meter</p>
+                <div class="button-container">
+                    <button class="add-to-cart" onclick="addToCart('Allen-Solly Fabric', 280.00, 'silk.jpg')">Add to Cart</button>
+                    <button class="buy-now" onclick="buyNow(280.00)">Buy Now</button>
+                </div>
+            </div>
+            <div class="cloth-item">
+                <img src="silk.jpg" alt="Raymond Fabric" />
+                <h3>Raymond Fabric</h3>
+                <p>₹350.00 per meter</p>
+                <div class="button-container">
+                    <button class="add-to-cart" onclick="addToCart('Raymond Fabric', 350.00, 'silk.jpg')">Add to Cart</button>
+                    <button class="buy-now" onclick="buyNow(350.00)">Buy Now</button>
+                </div>
+            </div>
+            <div class="cloth-item">
+                <img src="polyester.jpg" alt="Polyester Fabric" />
+                <h3>Polyester Fabric</h3>
+                <p>₹200.00 per meter</p>
+                <div class="button-container">
+                    <button class="add-to-cart" onclick="addToCart('Polyester Fabric', 200.00, 'polyester.jpg')">Add to Cart</button>
+                    <button class="buy-now" onclick="buyNow(200.00)">Buy Now</button>
+                </div>
+            </div>
+            <div class="cloth-item">
+                <img src="cotton.jpg" alt="Cotton Fabric" />
+                <h3>Cotton Fabric</h3>
+                <p>₹150.00 per meter</p>
+                <div class="button-container">
+                    <button class="add-to-cart" onclick="addToCart('Cotton Fabric', 150.00, 'cotton.jpg')">Add to Cart</button>
+                    <button class="buy-now" onclick="buyNow(150.00)">Buy Now</button>
+                </div>
+            </div>
+            <div class="cloth-item">
+                <img src="silk.jpg" alt="Silk Fabric" />
+                <h3>Silk Fabric</h3>
+                <p>₹500.00 per meter</p>
+                <div class="button-container">
+                    <button class="add-to-cart" onclick="addToCart('Silk Fabric', 500.00, 'silk.jpg')">Add to Cart</button>
+                    <button class="buy-now" onclick="buyNow(500.00)">Buy Now</button>
+                </div>
+            </div>
+            <div class="cloth-item">
+                <img src="linen.jpg" alt="Linen Fabric" />
+                <h3>Linen Fabric</h3>
+                <p>₹300.00 per meter</p>
+                <div class="button-container">
+                    <button class="add-to-cart" onclick="addToCart('Linen Fabric', 300.00, 'linen.jpg')">Add to Cart</button>
+                    <button class="buy-now" onclick="buyNow(300.00)">Buy Now</button>
+                </div>
+            </div>
+            <div class="cloth-item">
+                <img src="wool.jpg" alt="Wool Fabric" />
+                <h3>Wool Fabric</h3>
+                <p>₹700.00 per meter</p>
+                <div class="button-container">
+                    <button class="add-to-cart" onclick="addToCart('Wool Fabric', 700.00, 'wool.jpg')">Add to Cart</button>
+                    <button class="buy-now" onclick="buyNow(700.00)">Buy Now</button>
+                </div>
+            </div>
+            <div class="cloth-item">
+                <img src="satin.jpg" alt="Satin Fabric" />
+                <h3>Satin Fabric</h3>
+                <p>₹600.00 per meter</p>
+                <div class="button-container">
+                    <button class="add-to-cart" onclick="addToCart('Satin Fabric', 600.00, 'satin.jpg')">Add to Cart</button>
+                    <button class="buy-now" onclick="buyNow(600.00)">Buy Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div> <!-- Notification element -->
+
+    <script>
+        function addToCart(itemName, itemPrice, itemImage) {
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            const existingItemIndex = cartItems.findIndex(item => item.name === itemName);
+
+            if (existingItemIndex > -1) {
+                // Item already exists in the cart, increase the quantity
+                cartItems[existingItemIndex].quantity += 1;
+            } else {
+                // Item does not exist, add it to the cart with quantity 1
+                cartItems.push({ name: itemName, price: itemPrice, image: itemImage, quantity: 1 });
+            }
+
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+            showNotification(`${itemName} has been added to your cart!`); // Show notification
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block'; // Show the notification
+            notification.style.opacity = 1; // Set opacity to 1
+
+            // Hide the notification after 2 seconds
+            setTimeout(() => {
+                notification.style.opacity = 0; // Fade out
+                setTimeout(() => {
+                    notification.style.display = 'none'; // Hide after fade out
+                }, 500); // Wait for fade out to complete
+            }, 2000); // Show for 2 seconds
+        }
+
+        function buyNow(itemPrice) {
+            const gst = itemPrice * 0.18; // 18% GST
+            const totalWithGST = itemPrice + gst;
+
+            // Store the total cost in local storage to access it on the buy page
+            localStorage.setItem('totalCost', totalWithGST);
+            window.location.href = 'buy.html'; // Redirect to buy page
+        }
+    </script>
+</body>
+</html>

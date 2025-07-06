@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Buy Page</title>
+    <!-- Google Fonts: Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --button-gradient: linear-gradient(45deg, #3a86ff, #8338ec, #ffd60a);
+            --font-color-light: #fff;
+            --nav-background: rgba(2, 0, 36, 0.9);
+            --constant-background: #020024; /* Constant background color */
+        }
+
+        /* Reset & base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            animation: bgColorCycle 45s linear infinite;
+            color: var(--font-color-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes bgColorCycle {
+            0%   { background-color: #020024; }
+            15%  { background-color: #090979; }
+            30%  { background-color: #00d4ff; }
+            45%  { background-color: #3a0ca3; }
+            60%  { background-color: #4361ee; }
+            75%  { background-color: #4895ef; }
+            90%  { background-color: #4cc9f0; }
+            100% { background-color: #020024; }
+        }
+
+        .navbar {
+            height:80px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-background);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            color: var(--font-color-light);
+            animation: colorChange 5s infinite alternate; /* Color change animation for text */
+        }
+
+        @keyframes colorChange {
+            0% { color: #3a86ff; }
+            25% { color: #8338ec; }
+            50% { color: #ffd60a; }
+            75% { color: #ff006e; }
+            100% { color: #00bfff; }
+        }
+
+        .navbar a {
+            color: var(--font-color-light);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #ffd60a; /* Change color on hover */
+        }
+
+        .content {
+            margin-top: 80px; /* Space for fixed navbar */
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1; /* Allow content to grow */
+            display: flex;
+            justify-content: center; /* Center items horizontally */
+            align-items: center; /* Center items vertically */
+        }
+
+        .buy-container {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 20px;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(9, 171, 203, 0.402);
+            display: flex;
+            flex-direction: column; /* Stack items vertically */
+            align-items: center; /* Center items */
+        }
+
+        .buy-container h2 {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Add text shadow to the heading */
+        }
+
+        .total-cost {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            font-weight: bold; /* Bold font for total cost */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Add text shadow to total cost */
+        }
+
+        .payment-option {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            width: 100%; /* Full width */
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Add text shadow to payment options */
+        }
+
+        .payment-option:hover {
+            background: rgba(255, 255, 255, 0.2); /* Change background on hover */
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar h1 {
+                font-size: 1.5rem;
+            }
+
+            .navbar a {
+                font-size: 1rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .total-cost {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar h1 {
+                font-size: 1.2rem;
+            }
+
+            .navbar a {
+                font-size: 0.9rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .total-cost {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="three.html"><h1>Clothing Brand</h1></a>
+        <div>
+            <a href="three.html">Home</a>
+            <a href="dress.html">Ready-Made</a>
+            <a href="material.html">Fabric</a>
+            <a href="cart.html">Cart</a>
+            <a href="buy.html">Buy</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="buy-container">
+            <h2>Payment Options</h2>
+            <div id="total-cost" class="total-cost"></div>
+            <div class="payment-option" onclick="alert('Paying with Credit Card')">Credit Card</div>
+            <div class="payment-option" onclick="alert('Paying with UPI')">UPI</div>
+            <div class="payment-option" onclick="alert('Paying with Bank Transfer')">Bank Transfer</div>
+        </div>
+    </div>
+
+    <script>
+        function calculateTotal() {
+            const totalCost = parseFloat(localStorage.getItem('totalCost')) || 0;
+            document.getElementById('total-cost').textContent = `Total Cost (Including GST): ₹${totalCost.toFixed(2)}`;
+        }
+
+        // Calculate total on page load
+        window.onload = calculateTotal;
+    </script>
+</body>
+</html>

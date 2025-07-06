@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clothing Brand Login & Registration</title>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;display=swap" rel="stylesheet" />
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <style>
+        :root {
+            --button-gradient: linear-gradient(45deg, #3a86ff, #8338ec, #ffd60a);
+            --input-bg: rgba(255,255,255,0.15);
+            --input-border: rgba(255,255,255,0.4);
+            --popup-bg: rgba(0,0,0,0.7);
+            --font-color-light: #fff;
+        }
+
+        /* Reset & base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            animation: bgColorCycle 45s linear infinite;
+            color: var(--font-color-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes bgColorCycle {
+            0%   { background-color: #020024; }
+            15%  { background-color: #090979; }
+            30%  { background-color: #00d4ff; }
+            45%  { background-color: #3a0ca3; }
+            60%  { background-color: #4361ee; }
+            75%  { background-color: #4895ef; }
+            90%  { background-color: #4cc9f0; }
+            100% { background-color: #020024; }
+        }
+
+        /* Animated floating clothes icons container */
+        .floating-icons {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: visible;
+            z-index: 1;
+        }
+
+        .floating-icon {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            opacity: 0.8;
+            animation-timing-function: ease-in-out;
+            user-select: none;
+            filter: drop-shadow(0 0 2px rgba(0,0,0,0.3));
+        }
+
+        @keyframes floatUpDown {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.75;
+            }
+            50% {
+                transform: translateY(-20px) rotate(12deg);
+                opacity: 1;
+            }
+        }
+
+        /* Floating icons with dress images */
+        .floating-icon:nth-child(1) {
+            top: 12%;
+            left: 12%;
+            fill: #90e0ef;
+            animation: floatUpDown 6s infinite;
+            animation-delay: 0s;
+            transform-origin: center;
+        }
+        .floating-icon:nth-child(2) {
+            top: 38%;
+            left: 78%;
+            fill: #48cae4;
+            animation: floatUpDown 8s infinite;
+            animation-delay: 1.5s;
+        }
+        .floating-icon:nth-child(3) {
+            top: 70%;
+            left: 22%;
+            fill: #caf0f8;
+            animation: floatUpDown 7s infinite;
+            animation-delay: 1s;
+        }
+        .floating-icon:nth-child(4) {
+            top: 52%;
+            left: 58%;
+            fill: #ade8f4;
+            animation: floatUpDown 9s infinite;
+            animation-delay: 2s;
+        }
+        .floating-icon:nth-child(5) {
+            top: 25%;
+            left: 50%;
+            fill: #56cfe1;
+            animation: floatUpDown 5.5s infinite;
+            animation-delay: 2.7s;
+            transform-origin: center;
+        }
+        .floating-icon:nth-child(6) {
+            top: 68%;
+            left: 70%;
+            fill: #48cae4;
+            animation: floatUpDown 8.3s infinite;
+            animation-delay: 3.1s;
+            transform-origin: center;
+        }
+        .floating-icon:nth-child(7) {
+            top: 45%;
+            left: 15%;
+            fill: #90e0ef;
+            animation: floatUpDown 6.8s infinite;
+            animation-delay: 4.5s;
+            transform-origin: center;
+        }
+        .floating-icon:nth-child(8) {
+            top: 10%;
+            left: 85%;
+            fill: #b2f7ef;
+            animation: floatUpDown 10s infinite;
+            animation-delay: 0.4s;
+            transform-origin: center;
+        }
+        .floating-icon:nth-child(9) {
+            top: 80%;
+            left: 80%;
+            fill: #64dfdf;
+            animation: floatUpDown 9.5s infinite;
+            animation-delay: 3.7s;
+            transform-origin: center;
+        }
+        .floating-icon:nth-child(10) {
+            top: 55%;
+            left: 25%;
+            fill: #70d6ff;
+            animation: floatUpDown 7.5s infinite;
+            animation-delay: 5.4s;
+            transform-origin: center;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(16px);
+            border-radius: 50px; /* Increased border-radius for more pronounced curves */
+            max-width: 400px;
+            width: 100%;
+            padding: 40px 32px 48px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction:column;
+            gap: 32px;
+            position: relative;
+            z-index: 10;
+        }
+
+
+        .brand-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-align: center;
+            background: var(--button-gradient);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            user-select: none;
+            letter-spacing: 1.5px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            user-select: none;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: var(--input-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--input-border);
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--button-gradient);
+        }
+
+        .input-group .material-icons {
+            padding: 12px 16px;
+            font-size: 24px;
+            color: var(--font-color-light);
+            user-select: none;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            border: none;
+            background: transparent;
+            color: var(--font-color-light);
+            font-size: 1rem;
+            padding: 16px 12px;
+            flex: 1 1 auto;
+            outline-offset: 4px;
+            font-weight: 500;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        button.login-btn {
+            padding: 16px 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--font-color-light);
+            background-image: var(--button-gradient);
+            border: none;
+            border-radius: 50px; /* Increased border-radius for curved edges */
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        button.login-btn:hover,
+        button.login-btn:focus {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.7);
+        }
+        button.login-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Popup modal */
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--popup-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .popup-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .popup-content {
+            background: #3a86ff;
+            padding: 28px 48px;
+            border-radius: 50px; /* Increased border-radius for curve */
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+            box-shadow: 0 8px 24px rgba(58, 134, 255, 0.8);
+            text-align: center;
+            user-select: none;
+        }
+
+        /* Responsive */
+        @media(max-width: 480px) {
+            .login-card {
+                padding: 32px 24px 40px;
+            }
+            .brand-title {
+                font-size: 2.2rem;
+            }
+            button.login-btn {
+                font-size: 1rem;
+                padding: 14px 0;
+            }
+
+            .floating-icon {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating clothes icons in background as SVG -->
+    <div class="floating-icons" aria-hidden="true" tabindex="-1">
+        <!-- Dress Icon -->
+        <svg class="floating-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Dress icon">
+            <path d="M16 6h-2l-1.5 4-1.5-4H8c-1.1 0-2 .9-2 2 0 1.11.89 2 2 2v10h8V10c1.11 0 2-.89 2-2 0-1.1-.9-2-2-2z"></path>
+        </svg>
+        <!-- Pants Icon -->
+        <svg class="floating-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Pants icon">
+            <path d="M12 2l2.5 4H19v14h-2v-5h-6v5H5V6h4.5z"></path>
+        </svg>
+        <!-- Saree Icon -->
+        <svg class="floating-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Saree icon">
+            <path d="M7 3L5 21h14L17 3H7zm1 2h6l1.18 12H6.82L8 5z"></path>
+        </svg>
+        <!-- Shirt Icon -->
+        <svg class="floating-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-label="Shirt icon">
+            <path d="M16 3c-.55 0-1 .45-1 1v.75c-1.74.18-3.3.94-4.24 2.09L9 8.5 6 6v13h12V6l-3 2.5-.76-1.66a4.978 4.978 0 0 0-2.24-1.84V4c0-.55-.45-1-1-1z"></path>
+        </svg>
+        <!-- Additional icons can be added here -->
+    </div>
+
+    <main role="main" aria-label="Login to Clothing Brand account">
+        <section class="login-card" aria-live="polite" id="loginSection">
+            <h1 class="brand-title" aria-label="Clothing Brand Logo">Clothing Brand</h1>
+            <form id="loginForm" novalidate>
+                <div>
+                    <label for="emailInput">Email </label>
+                    <div class="input-group">
+                        <span class="material-icons" aria-hidden="true">mail_outline</span>
+                        <input
+                            type="email"
+                            id="emailInput"
+                            name="email"
+                            placeholder="you@gmail.com"
+                            autocomplete="email"
+                            required
+                            aria-required="true"
+                            aria-describedby="emailHelp"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label for="passwordInput">Password</label>
+                    <div class="input-group">
+                        <span class="material-icons" aria-hidden="true">lock_outline</span>
+                        <input
+                            type="password"
+                            id="passwordInput"
+                            name="password"
+                            placeholder="Enter Your Password"
+                            autocomplete="current-password"
+                            required
+                            aria-required="true"
+                        />
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-btn" aria-label="Log in to your account">Log In</button>
+                <p style="text-align: center; margin-top: 16px;">Don't have an account? <a href="#" id="showRegister">Register</a></p>
+            </form>
+        </section>
+
+        <section class="login-card" aria-live="polite" id="registerSection" style="display: none;">
+            <h1 class="brand-title" aria-label="Clothing Brand Logo">Register</h1>
+            <form id="registerForm" novalidate>
+                <div>
+                    <label for="nameInput">Name</label>
+                    <div class="input-group">
+                        <span class="material-icons" aria-hidden="true">person_outline</span>
+                        <input
+                            type="text"
+                            id="nameInput"
+                            name="name"
+                            placeholder="Your Name"
+                            required
+                            aria-required="true"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label for="registerEmailInput">Email </label>
+                    <div class="input-group">
+                        <span class="material-icons" aria-hidden="true">mail_outline</span>
+                        <input
+                            type="email"
+                            id="registerEmailInput"
+                            name="email"
+                            placeholder="you@gmail.com"
+                            autocomplete="email"
+                            required
+                            aria-required="true"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label for="registerPasswordInput">Password</label>
+                    <div class="input-group">
+                        <span class="material-icons" aria-hidden="true">lock_outline</span>
+                        <input
+                            type="password"
+                            id="registerPasswordInput"
+                            name="password"
+                            placeholder="Create a Password"
+                            required
+                            aria-required="true"
+                        />
+                    </div>
+                </div>
+                <button type="submit" class="login-btn" aria-label="Register your account">Register</button>
+                <p style="text-align: center; margin-top: 16px;">Already have an account? <a href="#" id="showLogin">Log In</a></p>
+            </form>
+        </section>
+    </main>
+
+    <div id="popup" class="popup-overlay" role="alert" aria-live="assertive" aria-atomic="true" aria-modal="true" hidden>
+        <div class="popup-content" tabindex="0">
+            Login Successful
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const popup = document.getElementById('popup');
+            const popupContent = popup.querySelector('.popup-content');
+            const loginSection = document.getElementById('loginSection');
+            const registerSection = document.getElementById('registerSection');
+            const showRegister = document.getElementById('showRegister');
+            const showLogin = document.getElementById('showLogin');
+
+            // Simple form validation and popup on login submit
+            loginForm.addEventListener('submit', event => {
+                event.preventDefault();
+                const email = loginForm.email.value.trim();
+                const password = loginForm.password.value;
+
+                if(email === '' || password === '') {
+                    alert('Please enter both email and password.');
+                    return;
+                }
+                showPopup('Login Successful');
+                loginForm.reset();
+            });
+
+            // Simple form validation and popup on register submit
+            registerForm.addEventListener('submit', event => {
+                event.preventDefault();
+                const name = registerForm.name.value.trim();
+                const email = registerForm.email.value.trim();
+                const password = registerForm.password.value;
+
+                if(name === '' || email === '' || password === '') {
+                    alert('Please fill in all fields.');
+                    return;
+                }
+                showPopup('Registration Successful');
+                registerForm.reset();
+            });
+
+            function showPopup(message) {
+                popupContent.textContent = message;
+                popup.hidden = false;
+                popup.classList.add('show');
+                popupContent.focus();
+
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                    popup.hidden = true;
+                }, 3000);
+            }
+
+            showRegister.addEventListener('click', (event) => {
+                event.preventDefault();
+                loginSection.style.display = 'none';
+                registerSection.style.display = 'block';
+            });
+
+            showLogin.addEventListener('click', (event) => {
+                event.preventDefault();
+                registerSection.style.display = 'none';
+                loginSection.style.display = 'block';
+            });
+        })();
+    </script>
+</body>
+</html>

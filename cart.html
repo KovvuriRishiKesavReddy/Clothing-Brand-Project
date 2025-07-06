@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shopping Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --button-gradient: linear-gradient(45deg, #3a86ff, #8338ec, #ffd60a);
+            --font-color-light: #fff;
+            --nav-background: rgba(2, 0, 36, 0.9);
+            --constant-background: #020024; /* Constant background color */
+        }
+
+        /* Reset & base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            animation: bgColorCycle 45s linear infinite;
+            color: var(--font-color-light);
+            display: flex;
+            flex-direction: column; /* Stack items vertically */
+            padding: 0; /* Remove padding */
+            overflow: hidden; /* Hide overflow */
+            position: relative;
+        }
+
+        @keyframes bgColorCycle {
+            0%   { background-color: #020024; }
+            15%  { background-color: #090979; }
+            30%  { background-color: #00d4ff; }
+            45%  { background-color: #3a0ca3; }
+            60%  { background-color: #4361ee; }
+            75%  { background-color: #4895ef; }
+            90%  { background-color: #4cc9f0; }
+            100% { background-color: #020024; }
+        }
+
+        .navbar {
+            height: 80px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-background);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .navbar h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            color: var(--font-color-light);
+            animation: colorChange 5s infinite alternate; /* Color change animation for text */
+        }
+
+        @keyframes colorChange {
+            0% { color: #3a86ff; }
+            25% { color: #8338ec; }
+            50% { color: #ffd60a; }
+            75% { color: #ff006e; }
+            100% { color: #00bfff; }
+        }
+
+        .navbar a {
+            color: var(--font-color-light);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #ffd60a; /* Change color on hover */
+        }
+
+        .content {
+            margin-top: 80px; /* Space for fixed navbar */
+            padding: 16px;
+            overflow-y: auto; /* Allow vertical scrolling */
+            flex: 1; /* Allow content to grow */
+            display: flex;
+            justify-content: center; /* Center items horizontally */
+            align-items: flex-start; /* Align items to the top */
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+        }
+
+        .content::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+        }
+
+        .cart {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh; /* Set a maximum height for the cart */
+            overflow-y: auto; /* Allow vertical scrolling within the cart */
+            box-shadow: 0 4px 20px rgba(9, 171, 203, 0.402);
+            display: flex;
+            flex-direction: column; /* Stack items vertically */
+            align-items: center; /* Center items */
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+        }
+
+        .cart::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center; /* Align items vertically in the center */
+            margin: 20px 0; /* Increased margin for spacing */
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 24px rgba(58, 239, 255, 0.8);
+            padding: 10px;
+            border-radius: 18px;
+            width: 100%; /* Full width */
+            justify-content: space-between; /* Space between image and remove button */
+        }
+        .cart-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            margin-right: 10px; /* Space between image and text */
+        }
+        .remove-button {
+            margin-left: 20px; /* Space between quantity input and remove button */
+            padding: 10px 15px; /* Adjust padding for better alignment */
+            background: #ff006e;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 8px 24px rgba(255, 87, 58, 0.8);
+            color: var(--font-color-light);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .remove-button:hover {
+            background: #ff4d94; /* Change background on hover */
+        }
+
+        .quantity-input {
+            width: 50px;
+            margin-left: 20px; /* Space between quantity input and item name */
+            padding: 5px;
+            border-radius: 9px;
+            box-shadow: 0 8px 24px rgba(210, 215, 219, 0.8);
+            border: 1px solid #ccc;
+        }
+
+        .total-cost {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            font-weight: bold; /* Bold font for total cost */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7); /* Add text shadow */
+        }
+
+        .total-quantity {
+            font-size: 1.2rem;
+            margin-top: 10px; /* Space above total quantity */
+        }
+
+        .buy-now-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff6b6b, #f7d94c); /* Vibrant gradient background */
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(226, 201, 7, 0.8);
+            color: var(--font-color-light);
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s; /* Smooth transition for background and transform */
+        }
+
+        .buy-now-button:hover {
+            background: linear-gradient(45deg, #f7d94c, #ff6b6b); /* Reverse gradient on hover */
+            transform: scale(1.05); /* Slightly enlarge the button on hover */
+        }
+
+
+        .terms-checkbox {
+            margin-top: 10px; /* Space above checkbox */
+            display: flex;
+            align-items: center;
+        }
+
+        .terms-checkbox input[type="checkbox"] {
+            margin-right: 10px; /* Space between checkbox and label */
+        }
+
+        .terms-checkbox input[type="checkbox"]:checked {
+            accent-color: rgb(60, 248, 3); /* Change checkbox color to green when checked */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar h1 {
+                font-size: 1.5rem;
+            }
+
+            .navbar a {
+                font-size: 1rem;
+            }
+
+            .cart-item {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar h1 {
+                font-size: 1.2rem;
+            }
+
+            .navbar a {
+                font-size: 0.9rem;
+            }
+
+            .cart-item {
+                font-size: 0.9rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="three.html"><h1>Clothing Brand</h1></a>
+        <div>
+            <a href="three.html">Home</a>
+            <a href="dress.html">Ready-Made</a>
+            <a href="material.html">Fabric</a>
+            <a href="cart.html">Cart</a>
+            <a href="buy.html">Buy</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="cart" id="cart">
+            <div id="cart-items"></div>
+            <div class="total-cost" id="total-cost"></div>
+            <div class="total-quantity" id="total-quantity"></div> <!-- Display total quantity -->
+            <div class="terms-checkbox">
+                <input type="checkbox" id="terms" />
+                <label for="terms">Accept Terms & Conditions</label>
+            </div>
+            <button class="buy-now-button" onclick="buyNow()">Buy Now</button>
+        </div>
+    </div>
+
+    <script>
+        function displayCart() {
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            const cartItemsDiv = document.getElementById('cart-items');
+            const totalCostDiv = document.getElementById('total-cost');
+            const totalQuantityDiv = document.getElementById('total-quantity');
+            cartItemsDiv.innerHTML = ''; // Clear previous items
+            let totalCost = 0;
+            let totalQuantity = 0; // Initialize total quantity
+
+            cartItems.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                itemDiv.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" />
+                    ${item.name} - ₹${item.price.toFixed(2)} 
+                    <input type="number" class="quantity-input" value="${item.quantity}" min="1" onchange="updateTotal()" data-index="${index}" />
+                    <button class="remove-button" onclick="removeFromCart(${index})">Remove</button>
+                `;
+                cartItemsDiv.appendChild(itemDiv);
+                totalCost += item.price * item.quantity; // Update total cost based on quantity
+                totalQuantity += item.quantity; // Update total quantity
+            });
+
+            totalCostDiv.textContent = `Total Cost: ₹${totalCost.toFixed(2)}`;
+            totalQuantityDiv.textContent = `Total Quantity: ${totalQuantity}`; // Display total quantity
+        }
+
+        function updateTotal() {
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            const totalCostDiv = document.getElementById('total-cost');
+            const totalQuantityDiv = document.getElementById('total-quantity');
+            let totalCost = 0;
+            let totalQuantity = 0; // Initialize total quantity
+
+            cartItems.forEach((item, index) => {
+                const quantityInput = document.querySelector(`.quantity-input[data-index="${index}"]`);
+                const quantity = parseInt(quantityInput.value) || 1; // Default to 1 if input is empty
+                totalCost += item.price * quantity; // Update total cost based on quantity
+                // Update the quantity in the cartItems array
+                cartItems[index].quantity = quantity;
+                totalQuantity += quantity; // Update total quantity
+            });
+
+            localStorage.setItem('cartItems', JSON.stringify(cartItems)); // Update local storage
+            totalCostDiv.textContent = `Total Cost: ₹${totalCost.toFixed(2)}`;
+            totalQuantityDiv.textContent = `Total Quantity: ${totalQuantity}`; // Display total quantity
+        }
+
+        function removeFromCart(index) {
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            if (cartItems[index].quantity > 1) {
+                // Decrease the quantity by 1
+                cartItems[index].quantity -= 1;
+            } else {
+                // Remove the item if quantity is 1
+                cartItems.splice(index, 1);
+            }
+            localStorage.setItem('cartItems', JSON.stringify(cartItems)); // Update local storage
+            displayCart(); // Refresh cart display
+        }
+
+        function buyNow() {
+            const termsCheckbox = document.getElementById('terms');
+            if (!termsCheckbox.checked) {
+                alert("You must accept the terms and conditions to proceed.");
+                return;
+            }
+
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            let totalCost = 0;
+
+            cartItems.forEach((item) => {
+                totalCost += item.price * item.quantity; // Calculate total cost based on quantity
+            });
+
+            const gst = totalCost * 0.18; // 18% GST
+            const totalWithGST = totalCost + gst;
+
+            // Store the total cost in local storage to access it on the buy page
+            localStorage.setItem('totalCost', totalWithGST);
+            window.location.href = 'buy.html'; // Redirect to buy page
+        }
+
+        // Display cart items on page load
+        window.onload = displayCart;
+    </script>
+</body>
+</html>
