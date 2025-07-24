@@ -7,6 +7,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier, StackingClassifier
 from sklearn.metrics import classification_report, accuracy_score
 import warnings
+import joblib 
 
 warnings.filterwarnings('ignore', category=UserWarning)
 warnings.filterwarnings('ignore', category=FutureWarning)
@@ -17,7 +18,7 @@ try:
     print(f"Data loaded successfully from {file_path}. Shape: {df.shape}")
 except FileNotFoundError:
     print(f"Error: The file '{file_path}' was not found. Please ensure it's in the correct directory.")
-    print("Please generate the data first using 'generate_enhanced_data.py'.")
+    print("Please generate the data first using 'generate_logical_data.py'.")
     exit()
 
 numerical_cols_for_outliers = ['Height_cm', 'Weight_kg', 'BMI', 'Hip_Circumference_cm', 'Shoulder_Width_cm']
@@ -37,7 +38,6 @@ print(f"Removed {initial_rows - rows_after_outliers} outliers. New dataset shape
 X = df.drop(columns=['Clothing_Size', 'Recommended_Cloth_Color'])
 y_clothing_size = df['Clothing_Size']
 y_recommended_color = df['Recommended_Cloth_Color']
-
 
 categorical_features = ['BMI_Category', 'Body_Shape', 'Style_Preference']
 numerical_features = ['Height_cm', 'Weight_kg', 'BMI', 'Hip_Circumference_cm', 'Shoulder_Width_cm']
@@ -75,13 +75,12 @@ base_estimators = [base_rf_1, base_rf_2, base_rf_3]
 
 final_estimator = RandomForestClassifier(n_estimators=250, random_state=42, n_jobs=-1)
 
-print("\n--- Building Stacking Classifier for Clothing Size ---")
 stacking_pipeline_cs = Pipeline(steps=[
     ('preprocessor', preprocessor),
     ('stacking_classifier', StackingClassifier(
         estimators=base_estimators,
         final_estimator=final_estimator,
-        cv=5,
+        cv=5, 
         n_jobs=-1,
         verbose=1
     ))
@@ -93,7 +92,7 @@ stacking_pipeline_rc = Pipeline(steps=[
     ('stacking_classifier', StackingClassifier(
         estimators=base_estimators,
         final_estimator=final_estimator,
-        cv=5,
+        cv=5, 
         n_jobs=-1,
         verbose=1
     ))
@@ -110,29 +109,42 @@ print("\nClassification Report (Clothing Size - Stacking Model):\n", classificat
 
 print("\n--- Training and Evaluating Stacking Classifier for Recommended Color ---")
 stacking_pipeline_rc.fit(X_train_rc, y_train_rc)
-y_pred_rc_encoded = stacking_pipeline_rc.predict(X_test_rc)
-y_pred_rc = label_encoder_color.inverse_transform(y_pred_rc_encoded)
+y_pred_rc_encoded = stacking_pipeline_rc.predict(X_test_rc) # This is for accuracy of the TOP 1 prediction
+y_pred_rc_proba = stacking_pipeline_rc.predict_proba(X_test_rc) # Get probabilities for all colors
+y_pred_rc = label_encoder_color.inverse_transform(y_pred_rc_encoded) # Convert top 1 prediction back to label
 y_test_rc_original = label_encoder_color.inverse_transform(y_test_rc)
 
-print("\nAccuracy Score (Recommended Color - Stacking Model):", accuracy_score(y_test_rc_original, y_pred_rc))
-print("\nClassification Report (Recommended Color - Stacking Model):\n", classification_report(y_test_rc_original, y_pred_rc, zero_division=0))
+print("\nAccuracy Score (Recommended Color - Stacking Model - Top 1):", accuracy_score(y_test_rc_original, y_pred_rc))
+print("\nClassification Report (Recommended Color - Stacking Model - Top 1):\n", classification_report(y_test_rc_original, y_pred_rc, zero_division=0))
 
-print("\n--- Example Prediction with Stacking Models ---")
+joblib.dump(stacking_pipeline_cs, 'stacking_pipeline_clothing_size.pkl')
+joblib.dump(label_encoder_clothing, 'label_encoder_clothing_size.pkl')
+joblib.dump(stacking_pipeline_rc, 'stacking_pipeline_recommended_color.pkl')
+joblib.dump(label_encoder_color, 'label_encoder_recommended_color.pkl')
+print("\nModels and Label Encoders saved as .pkl files.")
+
+print("\n--- Example Prediction with Stacking Models (with Top N Colors) ---")
 new_person_data = pd.DataFrame({
     'Height_cm': [183],
-    'Weight_kg': [82],
-    'BMI': [24.9],
+    'Weight_kg': [84],
+    'BMI': [25.1],
     'BMI_Category': ['Normal'],
-    'Body_Shape': ['Hourglass'],
-    'Style_Preference': ['Calm & Classic'],
-    'Hip_Circumference_cm': [95],
-    'Shoulder_Width_cm': [55]
+    'Body_Shape': ['Inverted Triangle'],
+    'Style_Preference': ['Soft & Gentle'],
+    'Hip_Circumference_cm': [85],
+    'Shoulder_Width_cm': [42]
 })
 
 predicted_clothing_size_encoded = stacking_pipeline_cs.predict(new_person_data)
 predicted_clothing_size = label_encoder_clothing.inverse_transform(predicted_clothing_size_encoded)
 print(f"Predicted Clothing Size for new person: {predicted_clothing_size[0]}")
 
-predicted_color_encoded = stacking_pipeline_rc.predict(new_person_data)
-predicted_color = label_encoder_color.inverse_transform(predicted_color_encoded)
-print(f"Predicted Recommended Color for new person: {predicted_color[0]}")
+N_TOP_COLORS = 5 
+predicted_color_proba = stacking_pipeline_rc.predict_proba(new_person_data)[0] # Get probabilities for the single new person
+top_n_color_indices = predicted_color_proba.argsort()[-N_TOP_COLORS:][::-1] # Get indices of top N probabilities
+top_n_colors = label_encoder_color.inverse_transform(top_n_color_indices)
+top_n_probabilities = predicted_color_proba[top_n_color_indices]
+
+print(f"Top {N_TOP_COLORS} Recommended Cloth Colors for new person:")
+for i in range(N_TOP_COLORS):
+    print(f"- {top_n_colors[i]} (Probability: {top_n_probabilities[i]:.2f})")
